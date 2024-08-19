@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="product_brand_view_form" model="ir.ui.view">
+    <!-- Product Brand Form View -->
+    <record id="product_brand_form_view" model="ir.ui.view">
         <field name="name">product.brand.form</field>
         <field name="model">product.brand</field>
         <field name="arch" type="xml">
@@ -16,7 +17,8 @@
         </field>
     </record>
 
-    <record id="product_brand_view_tree" model="ir.ui.view">
+    <!-- Product Brand Tree View -->
+    <record id="product_brand_tree_view" model="ir.ui.view">
         <field name="name">product.brand.tree</field>
         <field name="model">product.brand</field>
         <field name="arch" type="xml">
@@ -28,27 +30,30 @@
         </field>
     </record>
 
+    <!-- Product Brand Search View -->
+    <record id="product_brand_search_view" model="ir.ui.view">
+        <field name="name">product.brand.search</field>
+        <field name="model">product.brand</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="website"/>
+                <filter string="Exclusive" name="exclusive" domain="[('exclusive', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Product Brand Action -->
     <record id="action_product_brand" model="ir.actions.act_window">
         <field name="name">Product Brands</field>
         <field name="res_model">product.brand</field>
         <field name="view_mode">tree,form</field>
     </record>
 
+    <!-- Product Brand Menu Item -->
     <menuitem id="menu_product_brand"
               name="Brands"
               action="action_product_brand"
               parent="stock.menu_product_in_config_stock"
-              sequence="5"/>
-
-    <!-- Inherit Product Form View -->
-    <record id="product_template_form_view_inherit_brand" model="ir.ui.view">
-        <field name="name">product.template.form.inherit.brand</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_form_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='categ_id']" position="after">
-                <field name="brand_id"/>
-            </xpath>
-        </field>
-    </record>
+              sequence="4"/>
 </odoo>
