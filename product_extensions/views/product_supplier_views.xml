@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Supplier Form View -->
+    <record id="product_supplier_form_view" model="ir.ui.view">
+        <field name="name">product.supplier.form</field>
+        <field name="model">product.supplier</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="contact_person"/>
+                        <field name="email"/>
+                        <field name="phone"/>
+                        <field name="website"/>
+                        <field name="lead_time"/>
+                        <field name="min_order_qty"/>
+                        <field name="currency_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Supplier Tree View -->
+    <record id="product_supplier_tree_view" model="ir.ui.view">
+        <field name="name">product.supplier.tree</field>
+        <field name="model">product.supplier</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="contact_person"/>
+                <field name="email"/>
+                <field name="phone"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Supplier Action -->
+    <record id="action_product_supplier" model="ir.actions.act_window">
+        <field name="name">Product Suppliers</field>
+        <field name="res_model">product.supplier</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Supplier Menu Item -->
+    <menuitem id="menu_product_supplier"
+              name="Suppliers"
+              action="action_product_supplier"
+              parent="stock.menu_product_in_config_stock"
+              sequence="5"/>
+</odoo>
