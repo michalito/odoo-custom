@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Actions -->
+    <record id="action_add_scanned_item" model="ir.actions.act_window">
+        <field name="name">Add Scanned Item</field>
+        <field name="res_model">barcode.scanner.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_operation_type': 'add'}</field>
+    </record>
+
+    <record id="action_remove_scanned_item" model="ir.actions.act_window">
+        <field name="name">Remove Scanned Item</field>
+        <field name="res_model">barcode.scanner.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_operation_type': 'remove'}</field>
+    </record>
+
+    <!-- Barcode Scanner Form View -->
+    <record id="view_barcode_scanner_form" model="ir.ui.view">
+        <field name="name">barcode.scanner.form</field>
+        <field name="model">barcode.scanner</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" 
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_update_inventory" string="Update Inventory" type="object" 
+                            class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_add_scanned_item)d" string="Add Item" type="action" 
+                                class="oe_stat_button" icon="fa-plus" invisible="state != 'draft'"/>
+                        <button name="%(action_remove_scanned_item)d" string="Remove Item" type="action" 
+                                class="oe_stat_button" icon="fa-minus" invisible="state != 'draft'"/>
+                        <button name="action_open_view_item_wizard" string="View Item" type="object" 
+                                class="oe_stat_button" icon="fa-eye"/>
+                    </div>
+                    <group>
+                        <field name="name" readonly="state != 'draft'"/>
+                        <field name="location_id" readonly="state != 'draft'"/>
+                    </group>
+                    <notebook>
+                        <page string="Scanned Items">
+                            <field name="scanned_item_ids" readonly="state != 'draft'">
+                                <tree editable="bottom">
+                                    <field name="barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <button name="unlink" string="Delete" type="object" icon="fa-trash"
+                                            invisible="parent.state != 'draft'"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Barcode Scanner Tree View -->
+    <record id="view_barcode_scanner_tree" model="ir.ui.view">
+        <field name="name">barcode.scanner.tree</field>
+        <field name="model">barcode.scanner</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="location_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Barcode Scanner Search View -->
+    <record id="view_barcode_scanner_search" model="ir.ui.view">
+        <field name="name">barcode.scanner.search</field>
+        <field name="model">barcode.scanner</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="location_id"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Done" name="done" domain="[('state','=','done')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Location" name="group_by_location" context="{'group_by': 'location_id'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Barcode Scanner Action -->
+    <record id="action_barcode_scanner" model="ir.actions.act_window">
+        <field name="name">Barcode Scanner</field>
+        <field name="res_model">barcode.scanner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_barcode_scanner_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Barcode Scanner session
+            </p>
+        </field>
+    </record>
+
+    <!-- Barcode Scanner Wizard Form View -->
+    <record id="view_barcode_scanner_wizard_form" model="ir.ui.view">
+        <field name="name">barcode.scanner.wizard.form</field>
+        <field name="model">barcode.scanner.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="barcode"/>
+                    <field name="quantity" invisible="operation_type == 'view'"/>
+                    <field name="operation_type" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_process" string="Process" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_barcode_scanner_root" name="Barcode Scanner" parent="stock.menu_stock_root" sequence="100"/>
+    <menuitem id="menu_barcode_scanner_sessions" name="Scanner Sessions" parent="menu_barcode_scanner_root" action="action_barcode_scanner" sequence="10"/>
+</odoo>
