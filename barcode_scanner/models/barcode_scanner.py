@@ -19,22 +19,26 @@ class BarcodeScanner(models.Model):
         if self.state != 'draft':
             raise UserError('You can only add or remove items in draft state.')
         
+        # Check if the barcode exists
+        product = self.env['product.product'].search([('barcode', '=', barcode)], limit=1)
+        if not product:
+            raise UserError(f'No product found with barcode {barcode}')
+
+        if operation_type == 'remove':
+            quantity = -abs(quantity)  # Ensure quantity is negative for removals
+        else:
+            quantity = abs(quantity)  # Ensure quantity is positive for additions
+
         existing_line = self.scanned_item_ids.filtered(lambda l: l.barcode == barcode)
         if existing_line:
-            if operation_type == 'add':
-                existing_line.quantity += quantity
-            else:  # remove
-                if existing_line.quantity < quantity:
-                    raise UserError(f'Cannot remove more than existing quantity for barcode {barcode}')
-                existing_line.quantity -= quantity
-                if existing_line.quantity <= 0:
-                    existing_line.unlink()
+            existing_line.quantity += quantity
+            if existing_line.quantity == 0:
+                existing_line.unlink()
         else:
-            if operation_type == 'remove':
-                raise UserError(f'Cannot remove quantity for non-existent item with barcode {barcode}')
             self.env['barcode.scanner.line'].create({
                 'scanner_id': self.id,
                 'barcode': barcode,
+                'product_id': product.id,
                 'quantity': quantity
             })
         return True
@@ -91,6 +95,8 @@ class BarcodeScanner(models.Model):
             if quant:
                 quant.inventory_quantity = quant.quantity + line.quantity
             else:
+                if line.quantity < 0:
+                    raise UserError(f"Cannot remove quantity for non-existent stock of product with barcode {line.barcode}")
                 self.env['stock.quant'].create({
                     'product_id': products.id,
                     'location_id': self.location_id.id,
@@ -130,13 +136,17 @@ class BarcodeScannerLine(models.Model):
 
     scanner_id = fields.Many2one('barcode.scanner', 'Scanner')
     barcode = fields.Char('Barcode', required=True)
-    quantity = fields.Float('Quantity', default=1.0)
-    product_id = fields.Many2one('product.product', 'Product', compute='_compute_product')
+    quantity = fields.Float('Quantity')  # Can be positive or negative
+    product_id = fields.Many2one('product.product', 'Product', required=True)  # No longer computed
+    operation_type = fields.Selection([
+        ('add', 'Added'),
+        ('remove', 'Removed')
+    ], string='Operation', compute='_compute_operation_type', store=True)
 
-    @api.depends('barcode')
-    def _compute_product(self):
+    @api.depends('quantity')
+    def _compute_operation_type(self):
         for line in self:
-            line.product_id = self.env['product.product'].search([('barcode', '=', line.barcode)], limit=1)
+            line.operation_type = 'add' if line.quantity > 0 else 'remove'
 
 class BarcodeConflictWizard(models.TransientModel):
     _name = 'barcode.conflict.wizard'
@@ -181,6 +191,13 @@ class BarcodeScannerWizard(models.TransientModel):
         ('remove', 'Remove'),
         ('view', 'View')
     ], string='Operation Type', required=True)
+
+    @api.onchange('operation_type')
+    def _onchange_operation_type(self):
+        if self.operation_type == 'remove':
+            self.quantity = abs(self.quantity)  # Keep it positive in the UI
+        elif self.operation_type == 'add':
+            self.quantity = abs(self.quantity)
 
     def action_process(self):
         self.ensure_one()
