@@ -16,6 +16,9 @@
                 <field name="published" string="Published"/>
             </xpath> -->
 
+            <!-- Remove barcode field from the main form -->
+            <xpath expr="//field[@name='barcode']" position="replace"/>
+
             <!-- Modify General Information page -->
             <xpath expr="//page[@name='general_information']//group" position="inside">
                 <group string="Product Information">
@@ -36,7 +39,7 @@
 
             <!-- Add new tab for Supplier Info -->
             <xpath expr="//notebook" position="inside">
-                <page name="description_tab" string="Description">
+                <page name="supplier_tab" string="Supplier Info">
                     <group string="Supplier Information">
                         <field name="primary_supplier_id"/>
                         <field name="supplier_ids" widget="many2many_tags"/>
@@ -45,9 +48,12 @@
                 </page>
             </xpath>
 
+            <!-- Remove description field from the main form -->
+            <xpath expr="//field[@name='description']" position="replace"/>
+
             <!-- Add new tab for Description -->
             <xpath expr="//notebook" position="inside">
-                <page name="supplier_tab" string="Supplier Info">
+                <page name="description_tab" string="Description">
                     <group>
                         <field name="description" placeholder="Description for internal use..."/>
                         <!-- <field name="description_sale" placeholder="Description for sales order..."/>
