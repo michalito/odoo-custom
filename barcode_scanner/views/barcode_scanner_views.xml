@@ -16,6 +16,22 @@
         <field name="context">{'default_operation_type': 'remove'}</field>
     </record>
 
+    <record id="action_bulk_add_scanned_items" model="ir.actions.act_window">
+        <field name="name">Bulk Add Items</field>
+        <field name="res_model">barcode.scanner.bulk.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_operation_type': 'add'}</field>
+    </record>
+
+    <record id="action_bulk_remove_scanned_items" model="ir.actions.act_window">
+        <field name="name">Bulk Remove Items</field>
+        <field name="res_model">barcode.scanner.bulk.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_operation_type': 'remove'}</field>
+    </record>
+
     <!-- Barcode Scanner Form View -->
     <record id="view_barcode_scanner_form" model="ir.ui.view">
         <field name="name">barcode.scanner.form</field>
@@ -30,6 +46,8 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button name="%(action_bulk_add_scanned_items)d" string="Bulk Add Items" type="action" class="oe_stat_button" icon="fa-plus" invisible="state != 'draft'"/>
+                        <button name="%(action_bulk_remove_scanned_items)d" string="Bulk Remove Items" type="action" class="oe_stat_button" icon="fa-minus" invisible="state != 'draft'"/>
                         <button name="%(action_add_scanned_item)d" string="Add Item" type="action" class="oe_stat_button" icon="fa-plus" invisible="state != 'draft'"/>
                         <button name="%(action_remove_scanned_item)d" string="Remove Item" type="action" class="oe_stat_button" icon="fa-minus" invisible="state != 'draft'"/>
                         <button name="action_open_view_item_wizard" string="View Item" type="object" class="oe_stat_button" icon="fa-eye"/>
@@ -115,6 +133,24 @@
                 </group>
                 <footer>
                     <button name="action_process" string="Process" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Bulk Scanner Wizard Form View -->
+    <record id="view_barcode_scanner_bulk_wizard_form" model="ir.ui.view">
+        <field name="name">barcode.scanner.bulk.wizard.form</field>
+        <field name="model">barcode.scanner.bulk.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="bulk_barcodes"/>
+                    <field name="operation_type" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_process_bulk" string="Process" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

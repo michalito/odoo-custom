@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_barcode_scanner_all,barcode.scanner.all,model_barcode_scanner,base.group_user,1,1,1,1
 access_barcode_scanner_line_all,barcode.scanner.line.all,model_barcode_scanner_line,base.group_user,1,1,1,1
 access_barcode_scanner_wizard_all,barcode.scanner.wizard.all,model_barcode_scanner_wizard,base.group_user,1,1,1,1
+access_barcode_scanner_bulk_wizard_all,barcode.scanner.bulk.wizard.all,model_barcode_scanner_bulk_wizard,base.group_user,1,1,1,1

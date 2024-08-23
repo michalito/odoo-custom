@@ -1,3 +1,4 @@
+import re
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -232,4 +233,31 @@ class BarcodeScannerWizard(models.TransientModel):
                 return scanner.action_view_item(self.barcode)
             else:
                 scanner.action_scan_item(self.barcode, self.quantity, self.operation_type)
+        return {'type': 'ir.actions.act_window_close'}
+
+class BarcodeScannerBulkWizard(models.TransientModel):
+    _name = 'barcode.scanner.bulk.wizard'
+    _description = 'Barcode Scanner Bulk Wizard'
+
+    bulk_barcodes = fields.Text('Bulk Barcodes', required=True, help="Enter barcodes separated by commas or new lines")
+    operation_type = fields.Selection([
+        ('add', 'Add'),
+        ('remove', 'Remove')
+    ], string='Operation Type', required=True)
+
+    def action_process_bulk(self):
+        self.ensure_one()
+        active_id = self.env.context.get('active_id')
+        if active_id:
+            scanner = self.env['barcode.scanner'].browse(active_id)
+            if not scanner or scanner.state != 'draft':
+                raise UserError('You can only bulk add or remove items in draft state.')
+
+            # Normalize the input to handle commas and new lines
+            barcodes = re.split(r'[\s,]+', self.bulk_barcodes.strip())
+            barcodes = [barcode.strip() for barcode in barcodes if barcode.strip()]
+
+            for barcode in barcodes:
+                scanner.action_scan_item(barcode, 1, self.operation_type)
+                
         return {'type': 'ir.actions.act_window_close'}
