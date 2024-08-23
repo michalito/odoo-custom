@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Actions -->
     <record id="action_add_scanned_item" model="ir.actions.act_window">
@@ -24,22 +23,16 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm" string="Confirm" type="object" 
-                            class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_update_inventory" string="Update Inventory" type="object" 
-                            class="oe_highlight" invisible="state != 'confirmed'"/>
-                    <button name="action_revert_to_draft" string="Revert to Draft" type="object"
-                            invisible="state != 'confirmed'" />
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_update_inventory" string="Update Inventory" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_revert_to_draft" string="Revert to Draft" type="object" invisible="state != 'confirmed'" />
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(action_add_scanned_item)d" string="Add Item" type="action" 
-                                class="oe_stat_button" icon="fa-plus" invisible="state != 'draft'"/>
-                        <button name="%(action_remove_scanned_item)d" string="Remove Item" type="action" 
-                                class="oe_stat_button" icon="fa-minus" invisible="state != 'draft'"/>
-                        <button name="action_open_view_item_wizard" string="View Item" type="object" 
-                                class="oe_stat_button" icon="fa-eye"/>
+                        <button name="%(action_add_scanned_item)d" string="Add Item" type="action" class="oe_stat_button" icon="fa-plus" invisible="state != 'draft'"/>
+                        <button name="%(action_remove_scanned_item)d" string="Remove Item" type="action" class="oe_stat_button" icon="fa-minus" invisible="state != 'draft'"/>
+                        <button name="action_open_view_item_wizard" string="View Item" type="object" class="oe_stat_button" icon="fa-eye"/>
                     </div>
                     <group>
                         <field name="name" readonly="state != 'draft'"/>
@@ -54,8 +47,7 @@
                                     <field name="product_id"/>
                                     <field name="quantity"/>
                                     <field name="available_quantity"/>
-                                    <button name="unlink" string="Delete" type="object" icon="fa-trash"
-                                            invisible="parent.state != 'draft'"/>
+                                    <button name="unlink" string="Delete" type="object" icon="fa-trash" invisible="parent.state != 'draft'"/>
                                 </tree>
                             </field>
                         </page>
