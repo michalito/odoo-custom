@@ -31,18 +31,30 @@ class BarcodeScanner(models.Model):
 
         existing_line = self.scanned_item_ids.filtered(lambda l: l.barcode == barcode)
         if existing_line:
-            existing_line.quantity += quantity
+            new_quantity = existing_line.quantity + quantity
+            available_quantity = existing_line.available_quantity
+            if new_quantity < 0 and abs(new_quantity) > available_quantity:
+                raise UserError(f'Cannot remove more than the available quantity ({available_quantity}).')
+            existing_line.quantity = new_quantity
             if existing_line.quantity == 0:
                 existing_line.unlink()
         else:
+            quant = self.env['stock.quant'].search([
+                ('product_id', '=', product.id),
+                ('location_id', '=', self.location_id.id)
+            ], limit=1)
+            available_quantity = quant.quantity if quant else 0.0
+            if quantity < 0 and abs(quantity) > available_quantity:
+                raise UserError(f'Cannot remove more than the available quantity ({available_quantity}).')
             self.env['barcode.scanner.line'].create({
                 'scanner_id': self.id,
                 'barcode': barcode,
                 'product_id': product.id,
-                'quantity': quantity
+                'quantity': quantity,
+                'available_quantity': available_quantity
             })
         return True
-
+    
     def action_open_view_item_wizard(self):
         self.ensure_one()
         return {
@@ -144,7 +156,8 @@ class BarcodeScannerLine(models.Model):
     scanner_id = fields.Many2one('barcode.scanner', 'Scanner')
     barcode = fields.Char('Barcode', required=True)
     quantity = fields.Float('Quantity')  # Can be positive or negative
-    product_id = fields.Many2one('product.product', 'Product', required=True)  # No longer computed
+    product_id = fields.Many2one('product.product', 'Product', required=True)
+    available_quantity = fields.Float('Available Quantity', compute='_compute_available_quantity', store=True)
     operation_type = fields.Selection([
         ('add', 'Added'),
         ('remove', 'Removed')
@@ -154,6 +167,15 @@ class BarcodeScannerLine(models.Model):
     def _compute_operation_type(self):
         for line in self:
             line.operation_type = 'add' if line.quantity > 0 else 'remove'
+
+    @api.depends('product_id', 'scanner_id.location_id')
+    def _compute_available_quantity(self):
+        for line in self:
+            quant = self.env['stock.quant'].search([
+                ('product_id', '=', line.product_id.id),
+                ('location_id', '=', line.scanner_id.location_id.id)
+            ], limit=1)
+            line.available_quantity = quant.quantity if quant else 0.0
 
 class BarcodeConflictWizard(models.TransientModel):
     _name = 'barcode.conflict.wizard'
