@@ -130,6 +130,13 @@ class BarcodeScanner(models.Model):
             }
         }
 
+    def action_revert_to_draft(self):
+        self.ensure_one()
+        if self.state != 'confirmed':
+            raise UserError('You can only revert to draft from the confirmed state.')
+        self.state = 'draft'
+        return True
+    
 class BarcodeScannerLine(models.Model):
     _name = 'barcode.scanner.line'
     _description = 'Barcode Scanner Line'
