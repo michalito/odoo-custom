@@ -17,9 +17,10 @@ class ProductTemplate(models.Model):
     package_height = fields.Float(string='Package Height (cm)')
     supplier_product_code = fields.Char(string='Supplier Product Code')
     published = fields.Boolean(string='Published', default=False)
-
     supplier_ids = fields.Many2many('product.supplier', string='Suppliers')
     primary_supplier_id = fields.Many2one('product.supplier', string='Primary Supplier')
+    wholesale_price = fields.Float(string='Wholesale Price', digits='Product Price')
+    consignment_price = fields.Float(string='Consignment Price', digits='Product Price')
 
     @api.onchange('package_length', 'package_width', 'package_height')
     def _onchange_package_dimensions(self):

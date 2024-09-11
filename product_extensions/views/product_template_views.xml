@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Product Template Form View -->
     <record id="product_template_form_view_inherit_custom" model="ir.ui.view">
         <field name="name">product.template.form.inherit.custom</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
-            <!-- Keep the type field, but make it invisible
-            <xpath expr="//field[@name='type']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath> -->
+            <xpath expr="//field[@name='list_price']" position="after">
+                <field name="consignment_price" string="Consignment" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="wholesale_price" string="Wholesale" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </xpath>
 
-            <!-- Add published field after sale_ok
-            <xpath expr="//field[@name='sale_ok']" position="after">
-                <field name="published" string="Published"/>
-            </xpath> -->
-
-            <!-- Remove barcode field from the main form -->
+            <!-- Rest of the existing customizations -->
             <xpath expr="//field[@name='barcode']" position="replace"/>
 
-            <!-- Modify General Information page -->
             <xpath expr="//page[@name='general_information']//group" position="inside">
                 <group string="Product Information">
                     <field name="color" string="Colour"/>
                     <field name="size" string="Size"/>
                     <field name="brand_id" string="Brand"/>
                     <field name="base_sku" string="Base SKU"/>
-                    <!-- <field name="seller_ids" string="Supplier"/>  --> <!-- Removed this as it adds a whole thing about vendors and variants options -->
                     <field name="gender" string="Gender"/>
                 </group>
                 <group string="Package Information">
@@ -37,7 +29,6 @@
                 </group>
             </xpath>
 
-            <!-- Add new tab for Supplier Info -->
             <xpath expr="//notebook" position="inside">
                 <page name="supplier_tab" string="Supplier Info">
                     <group string="Supplier Information">
@@ -48,29 +39,15 @@
                 </page>
             </xpath>
 
-            <!-- Remove description field from the main form -->
             <xpath expr="//field[@name='description']" position="replace"/>
 
-            <!-- Add new tab for Description -->
             <xpath expr="//notebook" position="inside">
                 <page name="description_tab" string="Description">
                     <group>
                         <field name="description" placeholder="Description for internal use..."/>
-                        <!-- <field name="description_sale" placeholder="Description for sales order..."/>
-                        <field name="description_purchase" placeholder="Description for purchase order..."/> -->
                     </group>
                 </page>
             </xpath>
-            
-            <!-- Move standard_price field
-            <xpath expr="//label[@for='standard_price']" position="replace"/>
-            <xpath expr="//div[@name='standard_price_uom']" position="replace"/> -->
-
-            <!-- Add standard_price to the pricing section -->
-            <!-- <xpath expr="//div[@name='pricing']" position="inside">
-                <label for="standard_price" class="oe_inline" string="Cost"/>
-                <field name="standard_price" class="oe_inline" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
-            </xpath> -->
         </field>
     </record>
 
